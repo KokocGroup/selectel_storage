@@ -23,6 +23,7 @@ import selectel_storage
 
 from flask import Flask
 from flask.ext.mongoengine import MongoEngine
+from selectel_storage.fields.mongoengine import SelectelStorageField
 
 app = Flask(__name__)
 app.config['MONGODB_SETTINGS'] = {
