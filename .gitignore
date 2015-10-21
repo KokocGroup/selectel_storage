@@ -1,2 +1,7 @@
-.idea/
 *.pyc
+*.egg-info/
+.idea/
+*.sublime-project
+*.sublime-workspace
+dist/
+setup.pysetup.py
