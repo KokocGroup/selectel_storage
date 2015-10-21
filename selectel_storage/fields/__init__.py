@@ -1,9 +1,13 @@
 #! coging: utf-8
 from __future__ import unicode_literals
-from selectel_storage import settings, selectel_connection, SelectelStorageException
-from requests.exceptions import HTTPError
+
 import gzip
 from StringIO import StringIO
+
+import magic
+from requests.exceptions import HTTPError
+from selectel_storage import (SelectelStorageException, selectel_connection,
+                              settings)
 
 
 class SelectelCloudObject(object):
@@ -12,7 +16,8 @@ class SelectelCloudObject(object):
         self.path = path
         self._content = None
 
-    def read(self):
+    @property
+    def content(self):
         if not self._content:
             try:
                 compressed_content = selectel_connection.get(settings.CONTAINER, self.path)
@@ -25,8 +30,18 @@ class SelectelCloudObject(object):
                     raise SelectelStorageException(error)
         return self._content
 
-    def seek(*args, **kwargs):
+    @property
+    def mimetype(self):
+        return magic.from_buffer(self.content, mime=True)
+
+    def read(self):
+        return self.content
+
+    def seek(self, *args, **kwargs):
         pass
+
+    def tell(self):
+        return len(self.content)
 
     def delete(self):
         selectel_connection.remove(settings.CONTAINER, self.path)

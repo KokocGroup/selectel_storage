@@ -25,25 +25,21 @@ class SelectelStorageField(BaseField):
         return value
 
     def to_mongo(self, value):
-
             try:
-                if isinstance(value, (SelectelCloudObject, StringIO, file)):
-                    if value:
-                        if hasattr(value, 'seek'):
-                            value.seek(0)
-                        content = value.read()
-                        if hasattr(value, 'seek'):
-                            value.seek(0)
+                if hasattr(value, 'read'):
+                    if hasattr(value, 'seek'):
+                        value.seek(0)
+                    content = value.read()
+                    if hasattr(value, 'seek'):
+                        value.seek(0)
 
-                        path = self.get_path(content)
-                        compers_obj = StringIO()
-                        compers_obj_gzip = gzip.GzipFile(fileobj=compers_obj, mode='wb')
-                        compers_obj_gzip.write(content)
-                        compers_obj_gzip.close()
-                        selectel_connection.put(settings.CONTAINER, path, compers_obj.getvalue())
-                        return path
-                else:
-                    raise SelectelStorageException("type '{}' is not SelectelCloudObject, StringIO or file".format(type(value)))
+                    path = self.get_path(content)
+                    compers_obj = StringIO()
+                    compers_obj_gzip = gzip.GzipFile(fileobj=compers_obj, mode='wb')
+                    compers_obj_gzip.write(content)
+                    compers_obj_gzip.close()
+                    selectel_connection.put(settings.CONTAINER, path, compers_obj.getvalue())
+                    return path
             except Exception, e:
                 self.error(unicode(e))
 
@@ -52,5 +48,5 @@ class SelectelStorageField(BaseField):
             return value.path
 
     def validate(self, value):
-        if not isinstance(value, (SelectelCloudObject, StringIO, file)):
-            self.error("type '{}' is not SelectelCloudObject, StringIO or file".format(type(value)))
+        if not hasattr(value, 'read'):
+            self.error("type '{}' it does not implement the method 'read'".format(type(value)))

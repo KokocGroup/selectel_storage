@@ -1,7 +1,7 @@
 from setuptools import setup
 
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 setup(
     name='selectel-storage',
@@ -14,5 +14,6 @@ setup(
     install_requires=[
         'mongoengine==0.10.0',
         'selectel-api==0.1.3',
+        'python-magic==0.4.10'
     ],
 )
