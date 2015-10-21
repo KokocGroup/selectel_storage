@@ -30,7 +30,7 @@ class SelectelConnection(object):
 selectel_connection = SelectelConnection()
 
 
-def init_falsk_app(flask_app):
+def init_flask_app(flask_app):
     settings.USER = flask_app.config.get('SELECTEL_USER')
     settings.PASSWORD = flask_app.config.get('SELECTEL_PASSWORD')
     settings.CONTAINER = flask_app.config.get('SELECTEL_CONTAINER')
