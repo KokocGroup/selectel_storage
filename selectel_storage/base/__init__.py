@@ -23,43 +23,31 @@ class Singleton(type):
 class SelectelApi(object):
     __metaclass__ = Singleton
 
-    def __init__(self):
-        self.config = SelectelConfig()
-        self.connection = Storage(self.config.user, self.config.password)
-
-    def add(self, path, content):
-        self._make_call('put', self.config.container, path, content)
-
-    def get(self, path):
-        self._make_call('get', self.config.container, path)
-
-    def delete(self, path):
-        self._make_call('remove', self.config.container, path)
-
-    def _make_call(self, method, *args):
-        try:
-            getattr(self.connection, method)(*args)
-        except HTTPError, e:
-            error = str(e)
-            if e.response.status_code == 404:
-                error = 'File not found in container "{}"'.format(self.config.container)
-            elif e.response.status_code == 403:
-                error = "No permissions of action '{}' for the container '{}'".format(method, self.config.container)
-            raise SelectelStorageExeption(error)
-
-
-class SelectelConfig(dict):
-    __metaclass__ = Singleton
-
-    def __init__(self):
-        self.user = None
-        self.password = None
-        self.container = None
-
-    def set_config(self, user, password, container):
+    def __init__(self, user=None, password=None, container=None):
         self.user = user
         self.password = password
         self.container = container
+        self.connection = Storage(self.user, self.password)
+
+    def add(self, path, content):
+        self._make_call('put', self.container, path, content)
+
+    def get(self, path):
+        return self._make_call('get', self.container, path)
+
+    def delete(self, path):
+        self._make_call('remove', self.container, path)
+
+    def _make_call(self, method, *args):
+        try:
+            return getattr(self.connection, method)(*args)
+        except HTTPError, e:
+            error = str(e)
+            if e.response.status_code == 404:
+                error = 'File not found in container "{}"'.format(self.container)
+            elif e.response.status_code == 403:
+                error = "No permissions of action '{}' for the container '{}'".format(method, self.container)
+            raise SelectelStorageExeption(error)
 
 
 class SelectelCloudObject(object):
