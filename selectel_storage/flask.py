@@ -1,12 +1,12 @@
 #! coding: utf-8
+from selectel_storage.base import SelectelConfig, mongoengine
 from selectel_storage.exceptions import SelectelStorageExeption
-from selectel_storage.base import SelectelApi
 
 
 class SelectelStorage(object):
 
     def __init__(self, app=None):
-        self.connection = None
+        self.mongoengine = mongoengine
         if app:
             self.init_app(app)
 
@@ -16,7 +16,8 @@ class SelectelStorage(object):
         if not app.config.get('SELECTEL_STORAGE'):
             raise SelectelStorageExeption('Bad config: No SELECTEL_STORAGE options')
 
-        self.connection = SelectelApi(
+        self.selectel_config = SelectelConfig()
+        self.selectel_config.set_config(
             user=app.config['SELECTEL_STORAGE']['USER'],
             password=app.config['SELECTEL_STORAGE']['PASSWORD'],
             container=app.config['SELECTEL_STORAGE']['CONTAINER']

@@ -8,22 +8,24 @@ from hashlib import md5
 from StringIO import StringIO
 
 from mongoengine.fields import BaseField
-from selectel_storage.base import SelectelCloudObject, BaseFieldMixin
+from selectel_storage.base import SelectelCloudObject, SelectelApi
 
 
-class BaseMongoEngineField(BaseFieldMixin, BaseField):
+class SelectelStorageField(BaseField):
 
     def __init__(self, *args, **kwargs):
-        self.root = kwargs.get('root', "/")
-        super(BaseMongoEngineField, self).__init__(*args, **kwargs)
+        self.root = kwargs.pop('root', "/")
+        if not self.root.startswith('/'):
+            self.root = "/" + self.root
+        super(SelectelStorageField, self).__init__(*args, **kwargs)
 
     def get_path(self, content):
         filename = md5(content).hexdigest()
-        return self.root + os.path.join(filename[:2], filename[2:4], filename)
+        return self.root + os.path.join(filename[:2], filename[2:4], filename + ".gz")
 
     def to_python(self, value):
         if isinstance(value, types.StringTypes):
-            value = SelectelCloudObject(value, )
+            value = SelectelCloudObject(value)
         return value
 
     def to_mongo(self, value):
@@ -52,3 +54,7 @@ class BaseMongoEngineField(BaseFieldMixin, BaseField):
     def validate(self, value):
         if not hasattr(value, 'read'):
             self.error("type '{}' it does not implement the method 'read'".format(type(value)))
+
+    @property
+    def api_conn(self):
+        return SelectelApi()
