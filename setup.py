@@ -1,7 +1,7 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
-VERSION = "0.0.7"
+VERSION = "0.0.1"
 
 setup(
     name='selectel-storage',
@@ -9,11 +9,7 @@ setup(
     version=VERSION,
     url='https://github.com/KokocGroup/selectel_storage',
     download_url='https://github.com/KokocGroup/selectel_storage/tarball/v{}'.format(VERSION),
-    packages=['selectel_storage'],
-    package_dir={
-        'selectel_storage': 'selectel_storage',
-        'selectel_storage.base': 'selectel_storage.base'
-    },
+    packages=find_packages(),
     install_requires=[
         'mongoengine==0.10.0',
         'selectel-api==0.1.3',
