@@ -1,23 +1,27 @@
 #! coding: utf-8
 from __future__ import absolute_import, unicode_literals
 
+import gzip
+import os
 import types
 from hashlib import md5
 from StringIO import StringIO
-import gzip
-import os
 
 from mongoengine.fields import BaseField
-from selectel_storage import (SelectelStorageException, selectel_connection,
-                              settings)
-from selectel_storage.fields import SelectelCloudObject
+from selectel_storage.base import SelectelCloudObject, SelectelApi
 
 
 class SelectelStorageField(BaseField):
 
+    def __init__(self, *args, **kwargs):
+        self.root = kwargs.pop('root', "/")
+        if not self.root.startswith('/'):
+            self.root = "/" + self.root
+        super(SelectelStorageField, self).__init__(*args, **kwargs)
+
     def get_path(self, content):
         filename = md5(content).hexdigest()
-        return "/" + os.path.join(filename[:2], filename[2:4], filename)
+        return self.root + os.path.join(filename[:2], filename[2:4], filename + ".gz")
 
     def to_python(self, value):
         if isinstance(value, types.StringTypes):
@@ -38,7 +42,7 @@ class SelectelStorageField(BaseField):
                     compers_obj_gzip = gzip.GzipFile(fileobj=compers_obj, mode='wb')
                     compers_obj_gzip.write(content)
                     compers_obj_gzip.close()
-                    selectel_connection.put(settings.CONTAINER, path, compers_obj.getvalue())
+                    self.api_conn.add(path, compers_obj.getvalue())
                     return path
             except Exception, e:
                 self.error(unicode(e))
@@ -50,3 +54,7 @@ class SelectelStorageField(BaseField):
     def validate(self, value):
         if not hasattr(value, 'read'):
             self.error("type '{}' it does not implement the method 'read'".format(type(value)))
+
+    @property
+    def api_conn(self):
+        return SelectelApi()
