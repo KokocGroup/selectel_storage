@@ -2,12 +2,12 @@
 from __future__ import unicode_literals
 
 import gzip
+from datetime import datetime
 from StringIO import StringIO
 
 import magic
 from requests.exceptions import HTTPError
 from selectel.storage import Storage
-
 from selectel_storage.exceptions import SelectelStorageExeption
 
 
@@ -48,6 +48,18 @@ class SelectelApi(object):
             elif e.response.status_code == 403:
                 error = "No permissions of action '{}' for the container '{}'".format(method, self.container)
             raise SelectelStorageExeption(error)
+
+    def info(self):
+        url = "%s/%s" % (self.connection.auth.storage, self.container)
+        r = self.connection.session.head(url, verify=True)
+        r.raise_for_status()
+        result = {
+            'used': int(r.headers['X-Container-Bytes-Used']),
+            'quota': int(r.headers['X-Container-Meta-Quota-Bytes']),
+            'count': int(r.headers['X-Container-Object-Count']),
+            'private': True if r.headers['X-Container-Meta-Type'] == 'private' else False
+        }
+        return result
 
 
 class SelectelCloudObject(object):
