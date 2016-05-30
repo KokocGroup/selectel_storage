@@ -6,9 +6,28 @@ from datetime import datetime
 from StringIO import StringIO
 
 import magic
+import time
 from requests.exceptions import HTTPError
 from selectel.storage import Storage
 from selectel_storage.exceptions import SelectelStorageExeption
+from functools import wraps
+
+
+def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
+    def deco_retry(f):
+        @wraps(f)
+        def f_retry(*args, **kwargs):
+            mtries, mdelay = tries, delay
+            while mtries > 1:
+                try:
+                    return f(*args, **kwargs)
+                except ExceptionToCheck:
+                    time.sleep(mdelay)
+                    mtries -= 1
+                    mdelay *= backoff
+            return f(*args, **kwargs)
+        return f_retry
+    return deco_retry
 
 
 class Singleton(type):
@@ -38,16 +57,9 @@ class SelectelApi(object):
     def delete(self, path):
         self._make_call('remove', self.container, path)
 
+    @retry(HTTPError, delay=1.5)
     def _make_call(self, method, *args):
-        try:
-            return getattr(self.connection, method)(*args)
-        except HTTPError, e:
-            error = str(e)
-            if e.response.status_code == 404:
-                error = 'File not found in container "{}"'.format(self.container)
-            elif e.response.status_code == 403:
-                error = "No permissions of action '{}' for the container '{}'".format(method, self.container)
-            raise SelectelStorageExeption(error)
+        return getattr(self.connection, method)(*args)
 
     def info(self):
         url = "%s/%s" % (self.connection.auth.storage, self.container)
