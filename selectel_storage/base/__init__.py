@@ -7,7 +7,7 @@ from StringIO import StringIO
 
 import magic
 import time
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, ReadTimeout
 from selectel.storage import Storage
 from selectel_storage.exceptions import SelectelStorageExeption
 from functools import wraps
@@ -49,15 +49,15 @@ class SelectelApi(object):
         self.connection = Storage(self.user, self.password)
 
     def add(self, path, content):
-        self._make_call('put', self.container, path, content)
+        self._make_call('put_stream', self.container, path, content)
 
     def get(self, path):
-        return self._make_call('get', self.container, path)
+        return self._make_call('get_stream', self.container, path)
 
     def delete(self, path):
         self._make_call('remove', self.container, path)
 
-    @retry(HTTPError, delay=1.5)
+    @retry((ReadTimeout, HTTPError), delay=1.5)
     def _make_call(self, method, *args):
         try:
             return getattr(self.connection, method)(*args)
