@@ -42,7 +42,7 @@ class SelectelStorageField(BaseField):
                     compers_obj_gzip = gzip.GzipFile(fileobj=compers_obj, mode='wb')
                     compers_obj_gzip.write(content)
                     compers_obj_gzip.close()
-                    self.api_conn.add(path, compers_obj)
+                    self.api_conn.add(path, compers_obj.getvalue())
                     return path
             except Exception, e:
                 self.error(unicode(e))

@@ -48,8 +48,8 @@ class SelectelApi(object):
         self.container = container
         self.connection = Storage(self.user, self.password)
 
-    def add(self, path, content):
-        self._make_call('put_stream', self.container, path, content)
+    def add(self, path, file_obj):
+        self._make_call('put', self.container, path, file_obj)
 
     def get(self, path):
         return self._make_call('get_stream', self.container, path)
