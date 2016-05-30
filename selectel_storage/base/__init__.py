@@ -59,7 +59,12 @@ class SelectelApi(object):
 
     @retry(HTTPError, delay=1.5)
     def _make_call(self, method, *args):
-        return getattr(self.connection, method)(*args)
+        try:
+            return getattr(self.connection, method)(*args)
+        except HTTPError as e:
+            if e.response.status_code == 401:
+                self.connection.authenticate()
+            raise
 
     def info(self):
         url = "%s/%s" % (self.connection.auth.storage, self.container)
