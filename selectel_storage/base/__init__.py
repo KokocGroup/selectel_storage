@@ -89,8 +89,10 @@ class SelectelCloudObject(object):
     @property
     def content(self):
         if not self._content:
-            compressed_content = self.api_con.get(self.path)
-            self._content = gzip.GzipFile(fileobj=StringIO(compressed_content), mode='rb').read()
+            iostring = StringIO()
+            for chunk in self.api_con.get(self.path):
+                iostring.write(chunk)
+            self._content = gzip.GzipFile(fileobj=iostring, mode='rb').read()
         return self._content
 
     @property
