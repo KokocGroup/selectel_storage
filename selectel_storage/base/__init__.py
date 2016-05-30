@@ -92,6 +92,7 @@ class SelectelCloudObject(object):
             iostring = StringIO()
             for chunk in self.api_con.get(self.path):
                 iostring.write(chunk)
+            iostring.seek(0)
             self._content = gzip.GzipFile(fileobj=iostring, mode='rb').read()
         return self._content
 
