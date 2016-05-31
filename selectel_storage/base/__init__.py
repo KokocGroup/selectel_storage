@@ -2,14 +2,12 @@
 from __future__ import unicode_literals
 
 import gzip
-from datetime import datetime
 from StringIO import StringIO
 
 import magic
 import time
 from requests.exceptions import HTTPError, ReadTimeout
-from selectel.storage import Storage
-from selectel_storage.exceptions import SelectelStorageExeption
+from selectel_storage.base.storage import Storage
 from functools import wraps
 
 
