@@ -71,8 +71,7 @@ class SelectelApi(object):
         result = {
             'used': int(r.headers['X-Container-Bytes-Used']),
             'quota': int(r.headers['X-Container-Meta-Quota-Bytes']),
-            'count': int(r.headers['X-Container-Object-Count']),
-            'private': True if r.headers['X-Container-Meta-Type'] == 'private' else False
+            'count': int(r.headers['X-Container-Object-Count'])
         }
         return result
 
