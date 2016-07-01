@@ -2,3 +2,4 @@ mongoengine==0.10.0
 Fabric==1.10.2
 python-magic==0.4.10
 requests==2.10.0
+pycrypto-2.6.1
