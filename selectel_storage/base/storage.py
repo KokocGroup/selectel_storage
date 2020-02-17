@@ -10,7 +10,7 @@ class Storage(object):
     def update_expired(fn):
         def wrapper(*args, **kwargs):
             auth = args[0].auth
-            if auth.expired():
+            if auth is None or auth.expired():
                 args[0].authenticate()
             return fn(*args, **kwargs)
         return wrapper
@@ -32,7 +32,8 @@ class Storage(object):
         self.user = user
         self.timeout = timeout
         self.key = key
-        self.authenticate()
+        self.auth = None
+        self.session = None
 
     def authenticate(self):
         headers = {"X-Auth-User": self.user, "X-Auth-Key": self.key}
