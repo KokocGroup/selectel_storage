@@ -178,8 +178,6 @@ class Storage(object):
                 "count": int(r.headers["X-Container-Object-Count"]),
                 "usage": int(r.headers["X-Container-Bytes-Used"]),
                 "public": (r.headers.get("X-Container-Meta-Type") == "public"),
-                "tx": int(r.headers["X-Transfered-Bytes"]),
-                "rx": int(r.headers["X-Received-Bytes"])
             }
         else:
             dt = datetime.strptime(r.headers["Last-Modified"],
@@ -189,7 +187,6 @@ class Storage(object):
                 "last-modified": dt,
                 "hash": r.headers["ETag"],
                 "content-type": r.headers["Content-Type"],
-                "downloads": int(r.headers["X-Object-Downloads"])
             }
         return result
 
