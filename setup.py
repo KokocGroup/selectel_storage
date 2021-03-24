@@ -13,6 +13,6 @@ setup(
     install_requires=[
         'mongoengine==0.10.0',
         'python-magic==0.4.10',
-        'requests==2.10.0'
+        'requests==2.20.0'
     ],
 )
