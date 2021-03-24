@@ -5,3 +5,4 @@
 *.sublime-workspace
 dist/
 setup.pysetup.py
+build/

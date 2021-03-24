@@ -66,18 +66,11 @@ class SelectelApi(object):
 
     @retry((ReadTimeout, HTTPError), delay=1.5)
     def info(self):
-        url = "%s/%s" % (self.connection.auth.storage, self.container)
-        try:
-            r = self.connection.session.head(url, verify=True)
-            r.raise_for_status()
-        except HTTPError as e:
-            if e.response.status_code == 401:
-                self.connection.authenticate()
-            raise
+        res = self.connection.info(self.container)
         result = {
-            'used': int(r.headers['X-Container-Bytes-Used']),
-            'quota': int(r.headers['X-Container-Meta-Quota-Bytes']),
-            'count': int(r.headers['X-Container-Object-Count'])
+            'used': res['usage'],
+            'quota': res['quota'],
+            'count': res['count']
         }
         return result
 

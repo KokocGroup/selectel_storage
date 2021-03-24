@@ -177,6 +177,7 @@ class Storage(object):
             result = {
                 "count": int(r.headers["X-Container-Object-Count"]),
                 "usage": int(r.headers["X-Container-Bytes-Used"]),
+                'quota': int(r.headers['X-Container-Meta-Quota-Bytes']),
                 "public": (r.headers.get("X-Container-Meta-Type") == "public"),
             }
         else:
